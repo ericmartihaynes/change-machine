@@ -5,18 +5,21 @@ import { Contract } from "ethers";
 describe("Change Machine", () => {
   const ZERO = "0x0000000000000000000000000000000000000000";
   let changeMachine: Contract;
+  let mockUSDC: Contract;
   let user;
 
   before(async function () {
     [user] = await ethers.getSigners();
+    const mockUSDCFactory = await ethers.getContractFactory("MockUSDC");
+    mockUSDC = await mockUSDCFactory.deploy();
     const changeMachineFactory = await ethers.getContractFactory("ChangeMachine");
-    changeMachine = await changeMachineFactory.deploy("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174");
+    changeMachine = await changeMachineFactory.deploy(mockUSDC.address);
   });
 
   it("balance should return 0 when first deployed", async function () {
     expect(await changeMachine.balance()).to.equal(0);
   });
-  //TODO: Mock USDC contract & finish tests
+  //TODO: finish tests
   it("countChange should return 0 if the user has no change", async function () {
     
   });
