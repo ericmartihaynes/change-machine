@@ -13,6 +13,9 @@ contract ChangeMachine {
     IERC20 public USDC;
     uint256 public balance;
 
+    event Change(address indexed _user, uint256 _toChange, uint256 _changed, uint256 _leftOver);
+    event CashOut(address indexed _user, uint256 _toCashOut);
+
     constructor(address _usdc)  {
         USDC = IERC20(_usdc);
         Quarter = new Coin("Quarter", "QUARTER", 250000);
@@ -21,42 +24,52 @@ contract ChangeMachine {
         Penny = new Coin("Penny", "PENNY", 10000);
     }
 
-    function countChange() view public returns(uint256 amount) {
+    function countChange(address _user) view public returns(uint256 amount) {
         return _countChange(
-            Quarter.balanceOf(msg.sender),
-            Dime.balanceOf(msg.sender),
-            Nickel.balanceOf(msg.sender),
-            Penny.balanceOf(msg.sender)
+            Quarter.balanceOf(_user),
+            Dime.balanceOf(_user),
+            Nickel.balanceOf(_user),
+            Penny.balanceOf(_user)
         );
     }
 
-    function giveChange(uint256 _amount) external  returns(uint256 leftOverAmount) {
+    function giveChange(uint256 _amount) external {
         require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
-        leftOverAmount = _giveCoins(_amount, Quarter);
+
+        uint256 leftOverAmount = _giveCoins(_amount, Quarter);
         leftOverAmount = _giveCoins(leftOverAmount, Dime);
         leftOverAmount = _giveCoins(leftOverAmount, Nickel);
         leftOverAmount = _giveCoins(leftOverAmount, Penny);
-        return leftOverAmount;
+
+        emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
-    function giveQuarters(uint256 _amount) external returns(uint256 leftOverAmount) {
+    function giveQuarters(uint256 _amount) external {
         require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
-        return _giveCoins(_amount, Quarter);
+        uint256 leftOverAmount = _giveCoins(_amount, Quarter);
+
+        emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
-    function giveDimes(uint256 _amount) external returns(uint256 leftOverAmount) {
+    function giveDimes(uint256 _amount) external {
         require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
-        return _giveCoins(_amount, Dime);
+        uint256 leftOverAmount = _giveCoins(_amount, Dime);
+
+        emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
-    function giveNickels(uint256 _amount) external returns(uint256 leftOverAmount) {
+    function giveNickels(uint256 _amount) external {
         require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
-        return _giveCoins(_amount, Nickel);
+        uint256 leftOverAmount = _giveCoins(_amount, Nickel);
+
+        emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
-    function givePennies(uint256 _amount) external returns(uint256 leftOverAmount) {
+    function givePennies(uint256 _amount) external {
         require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
-        return _giveCoins(_amount, Penny);
+        uint256 leftOverAmount = _giveCoins(_amount, Penny);
+
+        emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
     function cashOut(uint256 _quarters, uint256 _dimes, uint256 _nickels, uint256 _pennies) public {
@@ -70,8 +83,9 @@ contract ChangeMachine {
         Nickel.burn(msg.sender, _nickels);
         Penny.burn(msg.sender, _pennies);
         balance -= amount;
-        USDC.transferFrom(address(this), msg.sender, amount);
+        USDC.transfer(msg.sender, amount);
 
+        emit CashOut(msg.sender, amount);
     }
 
     function cashOutAll() external {
