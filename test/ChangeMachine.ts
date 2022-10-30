@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 import { Contract } from "ethers";
-import util from "./utils";
+import util from "../utils";
 
 describe("Change Machine", () => {
   const ZERO = "0x0000000000000000000000000000000000000000";
