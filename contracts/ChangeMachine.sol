@@ -34,51 +34,51 @@ contract ChangeMachine {
     }
 
     function giveChange(uint256 _amount) external {
-        require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
-
         uint256 leftOverAmount = _giveCoins(_amount, Quarter);
         leftOverAmount = _giveCoins(leftOverAmount, Dime);
         leftOverAmount = _giveCoins(leftOverAmount, Nickel);
         leftOverAmount = _giveCoins(leftOverAmount, Penny);
+        USDC.transferFrom(msg.sender, address(this), _amount - leftOverAmount);
+        balance += _amount - leftOverAmount;
 
         emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
     function giveQuarters(uint256 _amount) external {
-        require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
         uint256 leftOverAmount = _giveCoins(_amount, Quarter);
+        USDC.transferFrom(msg.sender, address(this), _amount - leftOverAmount);
+        balance += _amount - leftOverAmount;
 
         emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
     function giveDimes(uint256 _amount) external {
-        require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
         uint256 leftOverAmount = _giveCoins(_amount, Dime);
+        USDC.transferFrom(msg.sender, address(this), _amount - leftOverAmount);
+        balance += _amount - leftOverAmount;
 
         emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
     function giveNickels(uint256 _amount) external {
-        require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
         uint256 leftOverAmount = _giveCoins(_amount, Nickel);
+        USDC.transferFrom(msg.sender, address(this), _amount - leftOverAmount);
+        balance += _amount - leftOverAmount;
 
         emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
     function givePennies(uint256 _amount) external {
-        require(USDC.balanceOf(msg.sender) >= _amount, "Not enough USDC");
         uint256 leftOverAmount = _giveCoins(_amount, Penny);
+        USDC.transferFrom(msg.sender, address(this), _amount - leftOverAmount);
+        balance += _amount - leftOverAmount;
 
         emit Change(msg.sender, _amount, _amount - leftOverAmount, leftOverAmount);
     }
 
     function cashOut(uint256 _quarters, uint256 _dimes, uint256 _nickels, uint256 _pennies) public {
-        require(Quarter.balanceOf(msg.sender) >= _quarters, "Not enough quarters");
-        require(Dime.balanceOf(msg.sender) >= _dimes, "Not enough dimes");
-        require(Nickel.balanceOf(msg.sender) >= _nickels, "Not enough nickels");
-        require(Penny.balanceOf(msg.sender) >= _pennies, "Not enough pennies");
         uint256 amount = _countChange(_quarters, _dimes, _nickels, _pennies);
-        if(_quarters > 0){
+        if(_quarters > 0) {
             Quarter.burn(msg.sender, _quarters);
         }
         if(_dimes > 0) {
@@ -106,21 +106,27 @@ contract ChangeMachine {
     }
 
     function _giveCoins(uint256 _amount, Coin _coin) internal returns(uint256 leftOverAmount) {
-        uint256 coinAmount = _amount / _coin.value();
-        leftOverAmount = _amount % _coin.value();
-        balance += _amount - leftOverAmount;
-        USDC.transferFrom(msg.sender, address(this), _amount - leftOverAmount);
-        _coin.mint(msg.sender, coinAmount);
-        return leftOverAmount;
+        uint256 coinValue = _coin.value();
+        if(_amount > coinValue) {
+            _coin.mint(msg.sender, _amount / coinValue);
+        }
+        return _amount % coinValue;
     }
 
     function _countChange(uint256 _quarters, uint256 _dimes, uint256 _nickels, uint256 _pennies) internal view returns(uint256 amount) {
-        return 
-            _quarters * Quarter.value() +
-            _dimes * Dime.value() +
-            _nickels * Nickel.value() +
-            _pennies * Penny.value()
-        ;
+        if(_quarters > 0) {
+            amount += _quarters * Quarter.value();
+        }
+        if(_dimes > 0) {
+            amount += _dimes * Dime.value();
+        }
+        if(_nickels > 0) {
+            amount += _nickels * Nickel.value();
+        }
+        if(_pennies > 0) {
+            amount += _pennies * Penny.value();
+        }
+        return amount;
     }
 
 }

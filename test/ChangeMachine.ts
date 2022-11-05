@@ -181,39 +181,39 @@ describe("Change Machine", () => {
   });
 
   it("giveChange should revert if the user does not have enough USDC", async function () {
-    await expect(changeMachine.giveChange(11000000)).to.be.revertedWith("Not enough USDC");
+    await expect(changeMachine.giveChange(11000000)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
   });
 
   it("giveQuarters should revert if the user does not have enough USDC", async function () {
-    await expect(changeMachine.giveQuarters(11000000)).to.be.revertedWith("Not enough USDC");
+    await expect(changeMachine.giveQuarters(11000000)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
   });
 
   it("giveDimes should revert if the user does not have enough USDC", async function () {
-    await expect(changeMachine.giveDimes(11000000)).to.be.revertedWith("Not enough USDC");
+    await expect(changeMachine.giveDimes(11000000)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
   });
 
   it("giveNickels should revert if the user does not have enough USDC", async function () {
-    await expect(changeMachine.giveNickels(11000000)).to.be.revertedWith("Not enough USDC");
+    await expect(changeMachine.giveNickels(11000000)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
   });
 
   it("givePennies should revert if the user does not have enough USDC", async function () {
-    await expect(changeMachine.givePennies(11000000)).to.be.revertedWith("Not enough USDC");
+    await expect(changeMachine.givePennies(11000000)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
   });
 
   it("cashOut should revert if the user has no quarters", async function () {
-    await expect(changeMachine.cashOut(1,0,0,0)).to.be.revertedWith("Not enough quarters");
+    await expect(changeMachine.cashOut(1,0,0,0)).to.be.revertedWith("ERC20: burn amount exceeds balance");
   });
 
   it("cashOut should revert if the user has no dimes", async function () {
-    await expect(changeMachine.cashOut(0,1,0,0)).to.be.revertedWith("Not enough dimes");
+    await expect(changeMachine.cashOut(0,1,0,0)).to.be.revertedWith("ERC20: burn amount exceeds balance");
   });
 
   it("cashOut should revert if the user has no nickels", async function () {
-    await expect(changeMachine.cashOut(0,0,1,0)).to.be.revertedWith("Not enough nickels");
+    await expect(changeMachine.cashOut(0,0,1,0)).to.be.revertedWith("ERC20: burn amount exceeds balance");
   });
 
   it("cashOut should revert if the user has no pennies", async function () {
-    await expect(changeMachine.cashOut(0,0,0,1)).to.be.revertedWith("Not enough pennies");
+    await expect(changeMachine.cashOut(0,0,0,1)).to.be.revertedWith("ERC20: burn amount exceeds balance");
   });
 
 });
