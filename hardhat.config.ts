@@ -2,6 +2,7 @@ require("dotenv").config();
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-contract-sizer";
 import "@nomiclabs/hardhat-etherscan";
+import "hardhat-gas-reporter";
 /** @type import('hardhat/config').HardhatUserConfig */
 
 
@@ -19,5 +20,8 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_KEY
+  },
+  gasReporter: {
+    enabled: true
   }
 };

@@ -78,10 +78,18 @@ contract ChangeMachine {
         require(Nickel.balanceOf(msg.sender) >= _nickels, "Not enough nickels");
         require(Penny.balanceOf(msg.sender) >= _pennies, "Not enough pennies");
         uint256 amount = _countChange(_quarters, _dimes, _nickels, _pennies);
-        Quarter.burn(msg.sender, _quarters);
-        Dime.burn(msg.sender, _dimes);
-        Nickel.burn(msg.sender, _nickels);
-        Penny.burn(msg.sender, _pennies);
+        if(_quarters > 0){
+            Quarter.burn(msg.sender, _quarters);
+        }
+        if(_dimes > 0) {
+            Dime.burn(msg.sender, _dimes);
+        }
+        if(_nickels > 0) {
+            Nickel.burn(msg.sender, _nickels);
+        }
+        if(_pennies > 0) {
+            Penny.burn(msg.sender, _pennies);
+        }
         balance -= amount;
         USDC.transfer(msg.sender, amount);
 
